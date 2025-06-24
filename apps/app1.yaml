@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: app1
-        image: localhost:5000/app1:latest  # will be updated by CI
+        image: localhost:5000/app1:8812a8f
         ports:
         - containerPort: 80
 ---
