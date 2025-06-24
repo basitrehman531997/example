@@ -1,0 +1,40 @@
+name: Build and Push App1 to K3D
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'apps/app1.yaml'
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted  # Your local runner
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Get short commit SHA
+      id: vars
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+    - name: Build Docker image
+      run: |
+        docker build -t localhost:5000/app1:${{ steps.vars.outputs.sha_short }} .
+
+    - name: Push Docker image to local registry
+      run: |
+        docker push localhost:5000/app1:${{ steps.vars.outputs.sha_short }}
+
+    - name: Update image in deployment.yaml
+      run: |
+        sed -i "s|image: localhost:5000/app1:.*|image: localhost:5000/app1:${{ steps.vars.outputs.sha_short }}|" k8s/deployment.yaml
+
+    - name: Commit and push updated YAML
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add apps/app1.yaml
+        git commit -m "Update app1 image to ${{ steps.vars.outputs.sha_short }}"
+        git push origin main

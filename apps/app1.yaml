@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
       - name: app1
-        image: hashicorp/http-echo
-        args: ["-listen=:80","-text=Hello from App1"]
+        image: localhost:5000/app1:latest  # will be updated by CI
         ports:
         - containerPort: 80
 ---
