@@ -14,7 +14,11 @@ spec:
     spec:
       containers:
       - name: app1
+<<<<<<< HEAD
         image: localhost:5000/app1:8812a8f
+=======
+        image: k3d-istio-registry:5000/app1:latest  # This will be replaced by CI with correct tag
+>>>>>>> f707e2f (update code)
         ports:
         - containerPort: 80
 ---

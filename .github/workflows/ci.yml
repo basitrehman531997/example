@@ -9,7 +9,8 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Your local runner
+    if: github.actor != 'github-actions'  # Prevent infinite loop
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
@@ -21,15 +22,15 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t localhost:5000/app1:${{ steps.vars.outputs.sha_short }} .
+        docker build -t k3d-istio-registry:5000/app1:${{ steps.vars.outputs.sha_short }} .
 
     - name: Push Docker image to local registry
       run: |
-        docker push localhost:5000/app1:${{ steps.vars.outputs.sha_short }}
+        docker push k3d-istio-registry:5000/app1:${{ steps.vars.outputs.sha_short }}
 
     - name: Update image in app1.yaml
       run: |
-        sed -i "s|image: localhost:5000/app1:.*|image: localhost:5000/app1:${{ steps.vars.outputs.sha_short }}|" apps/app1.yaml
+        sed -i "s|image: .*|image: k3d-istio-registry:5000/app1:${{ steps.vars.outputs.sha_short }}|" apps/app1.yaml
 
     - name: Commit and push updated YAML
       run: |
