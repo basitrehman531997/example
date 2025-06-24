@@ -9,33 +9,41 @@ on:
 
 jobs:
   build-and-deploy:
-    if: github.actor != 'github-actions'  # Prevent infinite loop
     runs-on: self-hosted
+    if: github.actor != 'github-actions[bot]'  # Better bot detection
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Get full history for proper rebasing
 
     - name: Get short commit SHA
       id: vars
       run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+    - name: Configure Docker for k3d registry
+      run: |
+        echo "127.0.0.1 k3d-istio-registry" | sudo tee -a /etc/hosts
+        docker login k3d-istio-registry:5000 -u dummy -p dummy
+
     - name: Build Docker image
       run: |
         docker build -t k3d-istio-registry:5000/app1:${{ steps.vars.outputs.sha_short }} .
 
-    - name: Push Docker image to local registry
+    - name: Push Docker image
       run: |
         docker push k3d-istio-registry:5000/app1:${{ steps.vars.outputs.sha_short }}
 
-    - name: Update image in app1.yaml
+    - name: Update deployment manifest
       run: |
         sed -i "s|image: .*|image: k3d-istio-registry:5000/app1:${{ steps.vars.outputs.sha_short }}|" apps/app1.yaml
 
-    - name: Commit and push updated YAML
+    - name: Commit and push changes
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
+        git pull --rebase origin main
         git add apps/app1.yaml
-        git commit -m "Update app1 image to ${{ steps.vars.outputs.sha_short }}"
+        git commit -m "CI: Update app1 to ${{ steps.vars.outputs.sha_short }} [skip ci]"
         git push origin main
