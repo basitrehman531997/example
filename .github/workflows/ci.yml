@@ -27,9 +27,9 @@ jobs:
       run: |
         docker push localhost:5000/app1:${{ steps.vars.outputs.sha_short }}
 
-    - name: Update image in deployment.yaml
+    - name: Update image in app1.yaml
       run: |
-        sed -i "s|image: localhost:5000/app1:.*|image: localhost:5000/app1:${{ steps.vars.outputs.sha_short }}|" k8s/deployment.yaml
+        sed -i "s|image: localhost:5000/app1:.*|image: localhost:5000/app1:${{ steps.vars.outputs.sha_short }}|" apps/app1.yaml
 
     - name: Commit and push updated YAML
       run: |
