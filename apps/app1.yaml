@@ -14,11 +14,7 @@ spec:
     spec:
       containers:
       - name: app1
-<<<<<<< HEAD
         image: k3d-istio-registry:5000/app1:4ec2ccb
-=======
-        image: k3d-istio-registry:5000/app1:4ec2ccb
->>>>>>> f707e2f (update code)
         ports:
         - containerPort: 80
 ---
