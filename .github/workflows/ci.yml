@@ -10,13 +10,13 @@ on:
 jobs:
   build-and-deploy:
     runs-on: self-hosted
-    if: github.actor != 'github-actions[bot]'  # Better bot detection
+    if: github.actor != 'github-actions[bot]'
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # Get full history for proper rebasing
+        fetch-depth: 0
 
     - name: Get short commit SHA
       id: vars
@@ -24,7 +24,6 @@ jobs:
 
     - name: Configure Docker for k3d registry
       run: |
-        echo "127.0.0.1 k3d-istio-registry" | sudo tee -a /etc/hosts
         docker login k3d-istio-registry:5000 -u dummy -p dummy
 
     - name: Build Docker image
