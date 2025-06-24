@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: app1
-        image: k3d-istio-registry:5000/app1:4ec2ccb
+        image: k3d-istio-registry:5000/app1:c6a3c84
         ports:
         - containerPort: 80
 ---
